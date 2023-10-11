@@ -6,14 +6,14 @@ import subprocess
 
 from pathlib import Path
 
-def cli():
-	parser = argparse.ArgumentParser(prog='woodpecker',
-        description='Recursively extract archives and compressed files.')
-	parser.add_argument("directory", type=str, default='./'
-                , nargs='?', help="directory path to process")
-	return parser.parse_args()
+def cli() -> dict[str, str]:
+    parser = argparse.ArgumentParser(prog="woodpecker",
+        description="Recursively extract archives and compressed files.")
+    parser.add_argument("directory", type=str, default="./"
+        , nargs="?", help="directory path to process")
+    return vars(parser.parse_args())
 
-def find_files(directory):
+def find_files(directory: str) -> list[str]:
     files = []
     for dirpath, _, file_group in os.walk(directory):
         for file in file_group:
@@ -21,9 +21,9 @@ def find_files(directory):
             files.append(file)
     return files
 
-def extract(files):
+def extract(files: list[str]) -> None:
     for file in files:
-        print(f'Extracting {file}')
+        print(f"Extracting {file}")
         try:
             subprocess.run(["7zz", "x", file, "-o"+file+"_dump"
                             , "-y", "-p1234", "-bse0", "-bso0"], check=True)

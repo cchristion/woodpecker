@@ -4,6 +4,8 @@ import magic
 import argparse
 import subprocess
 
+from pathlib import Path
+
 def cli():
 	parser = argparse.ArgumentParser(prog='woodpecker',
         description='Recursively extract archives and compressed files.')
@@ -25,13 +27,14 @@ def extract(files):
         try:
             subprocess.run(['7zz', 'x', file, '-o'+file+'_dump'
                             , '-y', '-p1234', '-bse0', '-bso0'], check=True)
-            os.remove(file)
-        except Exception as e:
-            print(f'file: \'{file}\'\nError type: {type(e)}\nError message: {e}\n')
+            Path(file).unlink()
+        except subprocess.CalledProcessError as e:
+            print(f"file: \'{file}\'\
+                Error type: {type(e)}\nError message: {e}\n")
 
 if __name__ == "__main__":
 
-    pat = re.compile(r'archive|compress', re.IGNORECASE)
+    pat = re.compile(r"archive|compress", re.IGNORECASE)
 
     # Parsing CLI
     args = cli()
@@ -51,4 +54,5 @@ if __name__ == "__main__":
         extract(files)
 
         files = find_files(directory=args.directory)
-        files = list(filter(lambda file: pat.search(magic.from_file(file)), files))
+        files = list(filter(lambda file:
+            pat.search(magic.from_file(file)), files))

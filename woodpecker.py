@@ -25,8 +25,8 @@ def extract(files):
     for file in files:
         print(f'Extracting {file}')
         try:
-            subprocess.run(['7zz', 'x', file, '-o'+file+'_dump'
-                            , '-y', '-p1234', '-bse0', '-bso0'], check=True)
+            subprocess.run(["7zz", "x", file, "-o"+file+"_dump"
+                            , "-y", "-p1234", "-bse0", "-bso0"], check=True)
             Path(file).unlink()
         except subprocess.CalledProcessError as e:
             print(f"file: \'{file}\'\

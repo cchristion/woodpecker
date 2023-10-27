@@ -1,3 +1,5 @@
+"""Script to recursively extract archives and compressed files."""
+
 import os
 import re
 import magic
@@ -7,6 +9,7 @@ import subprocess
 from pathlib import Path
 
 def cli() -> dict[str, str]:
+    """Returns ."""
     parser = argparse.ArgumentParser(prog="woodpecker",
         description="Recursively extract archives and compressed files.")
     parser.add_argument("directory", type=str, default="./"
@@ -14,6 +17,7 @@ def cli() -> dict[str, str]:
     return vars(parser.parse_args())
 
 def find_files(directory: str) -> list[str]:
+    """Finds all the files in a given directory."""
     files = []
     for dirpath, _, file_group in os.walk(directory):
         for file in file_group:
@@ -22,6 +26,7 @@ def find_files(directory: str) -> list[str]:
     return files
 
 def extract(files: list[str]) -> None:
+    """Extracts files from a given list of archive/compressed files."""
     for file in files:
         print(f"Extracting {file}")
         try:
@@ -40,7 +45,7 @@ if __name__ == "__main__":
     args = cli()
 
     # Extracting files
-    files = find_files(directory=args.directory)
+    files = find_files(directory=args["directory"])
     files = list(filter(lambda file: pat.search(magic.from_file(file)), files))
     errors = []
     all_files = set()
@@ -53,6 +58,6 @@ if __name__ == "__main__":
             break
         extract(files)
 
-        files = find_files(directory=args.directory)
+        files = find_files(directory=args["directory"])
         files = list(filter(lambda file:
             pat.search(magic.from_file(file)), files))

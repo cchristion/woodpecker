@@ -5,9 +5,8 @@ import os
 import re
 import subprocess
 import logging
-import magic
-
 from pathlib import Path
+import magic
 
 def cli() -> dict[str, str]:
     """Return parsed cli."""
@@ -19,27 +18,27 @@ def cli() -> dict[str, str]:
 
 def find_files(directory: str) -> list[str]:
     """Find all the files in a given directory."""
-    files = []
+    file_list = []
     for dirpath, _, file_group in os.walk(directory):
         for file in file_group:
             abs_file = Path(dirpath) / file
-            files.append(abs_file.resolve())
-    return files
+            file_list.append(abs_file.resolve())
+    return file_list
 
-def extract(files: list[str]) -> None:
+def extract(file_list: list[str]) -> None:
     """Extract files from a given list of archive/compressed files."""
-    for file in files:
-        logging.info(f"Extracting {file}")
+    for file in file_list:
+        cmd = f"/usr/local/bin/7zz x {file} -o{file}_dump -y -p1234 -bse0 -bso0".split()
+        logging.info("Extracting %s", file)
         try:
-            subprocess.run(["7zz", "x", file, "-o"+file+"_dump"
-                            , "-y", "-p1234", "-bse0", "-bso0"], check=True)
+            subprocess.run(cmd, check=True)
             Path(file).unlink()
         except subprocess.CalledProcessError as error:
-            logging.info(f"file: \'{file}\'\
-                Error type: {type(error)}\nError message: {error}\n")
+            logging.info("file: %s\
+                Error type: %s\
+                Error message: %s\n", file, type(error), error)
 
 if __name__ == "__main__":
-
     pat = re.compile(r"archive|compress", re.IGNORECASE)
 
     # Parsing CLI
@@ -60,5 +59,4 @@ if __name__ == "__main__":
         extract(files)
 
         files = find_files(directory=args["directory"])
-        files = list(filter(lambda file:
-            pat.search(magic.from_file(file)), files))
+        files = list(filter(lambda file: pat.search(magic.from_file(file)), files))

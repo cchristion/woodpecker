@@ -22,8 +22,8 @@ def find_files(directory: str) -> list[str]:
     files = []
     for dirpath, _, file_group in os.walk(directory):
         for file in file_group:
-            abs_file = os.path.abspath(os.path.join(dirpath, file))
-            files.append(abs_file)
+            abs_file = Path(dirpath) / file
+            files.append(abs_file.resolve())
     return files
 
 def extract(files: list[str]) -> None:

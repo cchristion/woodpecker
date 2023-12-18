@@ -1,4 +1,4 @@
-"""Script to recursively extract archives and compressed files."""
+"""Python Script for Recursive Extraction of Compressed and Archived Files."""
 
 import argparse
 import logging
@@ -14,14 +14,14 @@ def cli() -> dict[str, str]:
     """Return parsed cli."""
     parser = argparse.ArgumentParser(
         prog="woodpecker",
-        description="Recursively extract archives and compressed files.",
+        description="Python Script for Recursive Extraction of Compressed and Archived Files.",
     )
     parser.add_argument(
         "directory",
         type=str,
         default="./",
         nargs="?",
-        help="directory path to process",
+        help="Specifies the path to the directory containing the compressed and archived files.",
     )
     return vars(parser.parse_args())
 

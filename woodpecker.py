@@ -14,14 +14,20 @@ def cli() -> dict[str, str]:
     """Return parsed cli."""
     parser = argparse.ArgumentParser(
         prog="woodpecker",
-        description="Python Script for Recursive Extraction of Compressed and Archived Files.",
+        description=(
+            "Python Script for Recursive Extraction "
+            "of Compressed and Archived Files."
+        ),
     )
     parser.add_argument(
         "directory",
         type=str,
         default="./",
         nargs="?",
-        help="Specifies the path to the directory containing the compressed and archived files.",
+        help=(
+            "Specifies the path to the directory containing "
+            "the compressed and archived files."
+        ),
     )
     return vars(parser.parse_args())
 
@@ -51,13 +57,12 @@ def extract(file_list: list[str]) -> None:
         ]
         logging.info("Extracting %s", file)
         try:
+            logging.info("Executing %s", cmd)
             subprocess.run(cmd, check=True)
             Path(file).unlink()
         except subprocess.CalledProcessError as error:
             logging.info(
-                "file: %s\
-                Error type: %s\
-                Error message: %s\n",
+                "file: %s Error type: %s Error message: %s",
                 file,
                 type(error),
                 error,

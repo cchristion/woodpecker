@@ -49,7 +49,7 @@ def extract(file_list: list[str]) -> None:
             "7zz",
             "x",
             file,
-            "-o" + file + "_dump",
+            "-o" + str(file) + "_dump",
             "-y",
             "-p123456",
             "-bse0",

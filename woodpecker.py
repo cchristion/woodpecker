@@ -49,7 +49,7 @@ def find_files(directory: Path) -> None:
                 fileq.append(file_path)
 
 
-def extract(file: Path, app: Path) -> None:
+def extract(file: Path, app: Path) -> bool:
     """Extract archived or compressed file using 7zz."""
     output_dir = str(file) + "_dump"
     cmd = [
@@ -72,6 +72,8 @@ def extract(file: Path, app: Path) -> None:
         find_files(Path(output_dir))
     except BaseException:
         logging.exception("%s", file)
+        return False
+    return True
 
 
 if __name__ == "__main__":
@@ -97,7 +99,15 @@ if __name__ == "__main__":
     fileq = deque()
     find_files(args["directory"])
 
-    while fileq:
-        extract(file=fileq.popleft(), app=path_7zip)
+    extract_ok = 0
+    extract_err = 0
 
-    logging.info("Extracted all Compressed and Archived files")
+    while fileq:
+        status = extract(file=fileq.popleft(), app=path_7zip)
+        if status:
+            extract_ok += 1
+        else:
+            extract_err += 1
+
+    logging.info("Extracted %d files", extract_ok)
+    logging.info("Failed to extract %d files", extract_err)

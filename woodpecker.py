@@ -64,7 +64,6 @@ def extract(file: Path, app: Path) -> None:
         "-bso0",
     ]
     try:
-        logging.info("Extracting: %s", file.name)
         subprocess.run(
             cmd,
             check=True,
@@ -73,7 +72,7 @@ def extract(file: Path, app: Path) -> None:
         logging.info("Extracted: %s", file.name)
         find_files(Path(output_dir))
     except BaseException:
-        logging.exception("%s:", file)
+        logging.exception("%s", file)
 
 
 if __name__ == "__main__":

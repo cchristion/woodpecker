@@ -47,7 +47,6 @@ def find_files(directory: Path) -> None:
                 continue
             if pat.search(file_type):
                 fileq.append(file_path)
-    logging.info("%d files in queue", len(fileq))
 
 
 def extract(file: Path, app: Path) -> None:

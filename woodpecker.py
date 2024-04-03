@@ -43,7 +43,7 @@ def find_files(directory: Path) -> None:
             try:
                 file_type = magic.from_file(file_path)
             except Exception:
-                logging.exception("Unable to determine file type %s", file_type)
+                logging.exception("Unable to determine file type %s", file_path)
                 continue
             if pat.search(file_type):
                 fileq.append(file_path)

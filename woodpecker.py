@@ -40,7 +40,12 @@ def find_files(directory: Path) -> None:
     for dirpath, _, filenames in directory.walk():
         for file in filenames:
             file_path = Path(dirpath / file).absolute()
-            if pat.search(magic.from_file(file_path)):
+            try:
+                file_type = magic.from_file(file_path)
+            except Exception:
+                logging.exception("Unable to determine file type %s", file_type)
+                continue
+            if pat.search(file_type):
                 fileq.append(file_path)
     logging.info("%d files in queue", len(fileq))
 

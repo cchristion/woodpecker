@@ -1,95 +1,100 @@
-"""Python Script for Recursive Extraction of Compressed and Archived Files."""
+#!/usr/bin/env python3
+
+"""Recursive Compressed and Archived files Extractor."""
 
 import argparse
 import logging
-import os
 import re
 import subprocess
+import sys
+from collections import deque
 from pathlib import Path
 
 import magic
 
 
-def cli() -> dict[str, str]:
-    """Return parsed cli."""
+def cli() -> dict:
+    """CLI argument parser."""
     parser = argparse.ArgumentParser(
-        prog="woodpecker",
-        description=(
-            "Python Script for Recursive Extraction "
-            "of Compressed and Archived Files."
-        ),
+        description="Recursive Compressed and Archived files Extractor",
     )
     parser.add_argument(
         "directory",
-        type=str,
-        default="./",
-        nargs="?",
-        help=(
-            "Specifies the path to the directory containing "
-            "the compressed and archived files."
-        ),
+        type=Path,
+        help="Path to directory",
     )
-    return vars(parser.parse_args())
+    parser.add_argument(
+        "-e",
+        "--extract_using",
+        type=str,
+        help="Alternative to 7zz to Extract files default: 7zz",
+        default=Path("7zz"),
+    )
+    args = parser.parse_args()
+    return vars(args)
 
 
-def find_files(directory: str) -> list[str]:
-    """Find all the files in a given directory."""
-    file_list = []
-    for dirpath, _, file_group in os.walk(directory):
-        for file in file_group:
-            abs_file = Path(dirpath) / file
-            file_list.append(abs_file.resolve())
-    return file_list
+def find_files(directory: Path) -> None:
+    """Queue all the files in a directory recursively."""
+    pat = re.compile(r"archive|compress", re.IGNORECASE)
+    for dirpath, _, filenames in directory.walk():
+        for file in filenames:
+            file_path = Path(dirpath / file).absolute()
+            if pat.search(magic.from_file(file_path)):
+                fileq.append(file_path)
+    logging.info("%d files in queue", len(fileq))
 
 
-def extract(file_list: list[str]) -> None:
-    """Extract files from a given list of archive/compressed files."""
-    for file in file_list:
-        cmd = [
-            "7zz",
-            "x",
-            file,
-            "-o" + str(file) + "_dump",
-            "-y",
-            "-p123456",
-            "-bse0",
-            "-bso0",
-        ]
-        logging.info("Extracting %s", file)
-        try:
-            logging.info("Executing %s", cmd)
-            subprocess.run(cmd, check=True)
-            Path(file).unlink()
-        except subprocess.CalledProcessError as error:
-            logging.info(
-                "file: %s Error type: %s Error message: %s",
-                file,
-                type(error),
-                error,
-            )
+def extract(file: Path, app: Path) -> None:
+    """Extract archived or compressed file using 7zz."""
+    output_dir = str(file) + "_dump"
+    cmd = [
+        app,
+        "x",
+        str(file),
+        "-o" + output_dir,
+        "-y",
+        "-p1234",
+        "-bse0",
+        "-bso0",
+    ]
+    try:
+        logging.info("Extracting: %s", file.name)
+        subprocess.run(
+            cmd,
+            check=True,
+        )
+        file.unlink()
+        logging.info("Extracted: %s", file.name)
+        find_files(Path(output_dir))
+    except BaseException:
+        logging.exception("%s:", file)
 
 
 if __name__ == "__main__":
-    pat = re.compile(r"archive|compress", re.IGNORECASE)
 
-    # Parsing CLI
+    logging.basicConfig(
+        format="%(asctime)s : %(levelname)s : %(message)s",
+        datefmt="%Y%m%dT%H%M%S",
+        encoding="utf-8",
+        level=logging.DEBUG,
+    )
+
     args = cli()
 
-    # Extracting files
-    files = find_files(directory=args["directory"])
-    files = list(filter(lambda file: pat.search(magic.from_file(file)), files))
-    errors = []
-    all_files = set()
+    path_7zip = subprocess.getoutput(f"command -v {args['extract_using']}")
+    path_7zip = Path(path_7zip)
 
-    while len(files) > 0:
-        files = [file for file in files if file not in all_files]
-        all_files.update(set(files))
+    if path_7zip == Path():
+        logging.error("7zz command not found")
+        sys.exit()
+    else:
+        logging.info("7zz path: %s", path_7zip)
 
-        if len(files) == 0:
-            break
-        extract(files)
+    fileq = deque()
+    find_files(args["directory"])
 
-        files = find_files(directory=args["directory"])
-        files = list(
-            filter(lambda file: pat.search(magic.from_file(file)), files),
-        )
+    while fileq:
+        extract(file=fileq.popleft(), app=path_7zip)
+
+    logging.info("Extracted all Compressed and Archived files")

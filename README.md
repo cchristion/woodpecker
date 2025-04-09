@@ -22,11 +22,17 @@ This Python script is designed to recursively extract compressed and archived fi
 
 The following options are available when running the script:
 ```
+usage: woodpecker.py [-h] [-e EXTRACT_USING] directory
+
+Recursive Compressed and Archived files Extractor
+
 positional arguments:
-  directory   Specifies the path to the directory containing the compressed and archived files.
+  directory             Path to directory
 
 options:
-  -h, --help  show this help message and exit
+  -h, --help            show this help message and exit
+  -e EXTRACT_USING, --extract_using EXTRACT_USING
+                        Alternative to 7zz to Extract files default: 7zz
 ```
 
 ## Examples

@@ -34,7 +34,7 @@ def cli() -> dict:
         "-e",
         "--extract_using",
         type=str,
-        help="Alternative to 7zz to Extract files default: 7zz",
+        help="Alternative to 7zz to Extract files, default: 7zz",
         default=Path("7zz"),
     )
     args = parser.parse_args()

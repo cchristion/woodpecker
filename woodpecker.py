@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
 
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "python-magic~=0.4",
+# ]
+# ///
+
 """Recursive Compressed and Archived files Extractor."""
 
 import argparse
@@ -77,7 +84,6 @@ def extract(file: Path, app: Path) -> bool:
 
 
 if __name__ == "__main__":
-
     logging.basicConfig(
         format="%(asctime)s : %(levelname)s : %(message)s",
         datefmt="%Y%m%dT%H%M%S",

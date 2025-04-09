@@ -32,13 +32,16 @@ options:
 ## Examples
 
 Extract all compressed and archived files in the current directory and its subdirectories:
+
+### Using Python
+
 ```shell
-python woodpecker.py /directory/path
+pip install --upgrade python-magic # dependency
+python woodpecker.py /path/to/extract
 ```
 
-## Dependencies
+### Using UV
 
-Install these packages before running the script if they are not already installed:
 ```shell
-pip install --upgrade python-magic
+uv run woodpecker.py /path/to/extract
 ```
